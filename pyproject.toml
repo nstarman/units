@@ -1,0 +1,154 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+
+[project]
+name = "units"
+authors = [
+  { name = "Nathaniel Starkman", email = "nstarman@users.noreply.github.com" },
+]
+description = "Units 2.0"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+  "Development Status :: 1 - Planning",
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: BSD License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering",
+  "Typing :: Typed",
+]
+dynamic = ["version"]
+dependencies = [
+  "array_api",
+  "astropy >= 5.3",
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest >=6",
+  "pytest-cov >=3",
+]
+dev = [
+  "pytest >=6",
+  "pytest-cov >=3",
+]
+docs = [
+  "sphinx>=7.0",
+  "myst_parser>=0.13",
+  "sphinx_copybutton",
+  "sphinx_autodoc_typehints",
+  "furo>=2023.08.17",
+]
+
+[project.urls]
+Homepage = "https://github.com/nstarman/units"
+"Bug Tracker" = "https://github.com/nstarman/units/issues"
+Discussions = "https://github.com/nstarman/units/discussions"
+Changelog = "https://github.com/nstarman/units/releases"
+
+
+[tool.hatch]
+version.source = "vcs"
+build.hooks.vcs.version-file = "src/units/_version.py"
+
+[tool.hatch.env.default]
+features = ["test"]
+scripts.test = "pytest {args}"
+
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
+xfail_strict = true
+filterwarnings = [
+  "error",
+]
+log_cli_level = "INFO"
+testpaths = [
+  "tests",
+]
+
+
+[tool.coverage]
+run.source = ["units"]
+port.exclude_lines = [
+  'pragma: no cover',
+  '\.\.\.',
+  'if typing.TYPE_CHECKING:',
+]
+
+[tool.mypy]
+  files = ["src", "tests"]
+  python_version = "3.10"
+  warn_unused_configs = true
+  strict = true
+  enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
+  warn_unreachable = true
+  disallow_untyped_defs = false
+  disallow_incomplete_defs = false
+
+  [[tool.mypy.overrides]]
+    module = "units.*"
+    disallow_untyped_defs = true
+    disallow_incomplete_defs = true
+
+
+  [[tool.mypy.overrides]]
+    module = [
+      "astropy.*",
+    ]
+    ignore_errors = true
+    ignore_missing_imports = true
+
+
+[tool.ruff]
+src = ["src"]
+
+[tool.ruff.lint]
+extend-select = ["ALL"]
+ignore = [
+  "ANN101",  # Missing type annotation for self in method
+  "ANN401",  # Dynamically typed expressions (typing.Any) are disallowed in `__getattr__`
+  "COM812",  # Missing trailing comma
+  "D105",    # Missing docstring in magic method
+  "ERA001",  # Commented-out code
+  "FIX002",  # Line contains TODO, consider resolving the issue
+  "PD",      # pandas-vet
+  "PLR",     # Design related pylint codes
+  "RET506",  # Unnecessary `elif` after `raise` statement
+  "RUF009",  # Do not perform function call `Unit` in dataclass defaults
+  "SLF001",  # Private member accessed
+  "TD002",   # Missing author in TODO; try: `# TODO(<author_name>): ...` or `# TODO @<author_name>: ...`
+  "TD003",   # Missing issue link on the line following this TODO
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F403"]
+"tests/**" = ["ANN", "D103", "S101", "T20"]
+"noxfile.py" = ["T20"]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+
+
+[tool.pylint]
+py-version = "3.10"
+ignore-paths = [".*/_version.py"]
+reports.output-format = "colorized"
+similarities.ignore-imports = "yes"
+messages_control.disable = [
+  "design",
+  "fixme",
+  "line-too-long",
+  "missing-module-docstring",
+  "wrong-import-position",
+]
