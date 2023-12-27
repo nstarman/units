@@ -21,11 +21,11 @@ _DIMENSIONS_CACHE: dict[str, Dimension] = {}
 @final
 @dataclass(frozen=True)
 class Dimension(DimensionAPI, Wrapper[PhysicalType]):
-    """System of dimensions.
+    """A dimension.
 
     .. todo::
 
-        Remove the ``Wrapper`` when decouple from Astropy.
+        Remove the ``Wrapper`` when merge into Astropy.
     """
 
     name: str

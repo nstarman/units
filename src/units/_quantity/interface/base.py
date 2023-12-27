@@ -1,27 +1,26 @@
-"""Interface for Quantity objects."""
-
 from __future__ import annotations
 
-__all__: list[str] = []
+__all__ = ["AbstractQuantityInterface"]
 
+from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, replace
-from functools import singledispatch
-from numbers import Number
 from typing import TYPE_CHECKING, Any, Generic, TypeVar, cast
 from weakref import ReferenceType  # noqa: TCH003
 
-import numpy as np
 from array_api import Array as ArrayAPI, ArrayAPINamespace
 
+from units._quantity import array_namespace
+from units._quantity.base import AbstractQuantity, NumPyMixin
+from units._quantity.interface.funcs import get_interface
 from units.api import Quantity as QuantityAPI
 
-from .core import Quantity  # noqa: TCH001
-
 if TYPE_CHECKING:
+    from numbers import Number
+
     from units._unit.core import Unit
 
-T = TypeVar("T")
 Array = TypeVar("Array", bound=ArrayAPI)
+T = TypeVar("T")
 
 
 @dataclass(frozen=True)
@@ -34,39 +33,46 @@ class Registrant(Generic[T]):
         return self.value
 
 
-@dataclass(frozen=False)
-class QuantityInterface(Generic[Array]):
-    """Interface for Quantity <-> Array interactions."""
-
-    quantity_ref: ReferenceType[Quantity[Array]]
+@dataclass(frozen=False, slots=True)
+class AbstractQuantityInterface(NumPyMixin, Generic[Array], metaclass=ABCMeta):
+    quantity_ref: ReferenceType[AbstractQuantity[Array]]
     value: Array
 
+    # ------------------
+    # Class construction
+
     def __init_subclass__(cls, register: type | tuple[type, ...]) -> None:
-        super().__init_subclass__()
+        # TODO: raises "TypeError: super(type, obj): obj must be an instance or
+        # subtype of type" super().__init_subclass__()
 
         # Register the interface
         registers = register if isinstance(register, tuple) else (register,)
         for typ in registers:
             get_interface.register(typ, Registrant(cls))
 
-    def __post_init__(self) -> None:
-        self._unit: Unit
+    # ------------------
+
+    @abstractmethod
+    def __wrapped_array_namespace__(
+        self, *, api_version: str | None = None
+    ) -> ArrayAPINamespace:
+        ...
 
     @property
-    def quantity(self) -> Quantity[Array]:
-        """The Quantity."""
+    def quantity(self) -> AbstractQuantity[Array]:
         out = self.quantity_ref()
         if out is None:
             msg = "Quantity has been deleted."
             raise ReferenceError(msg)
         return out
 
+    # --- Quantity API ---
+
     @property
     def unit(self) -> Unit:
-        """The unit."""
         return self.quantity.unit
 
-    def to_unit(self, unit: Unit) -> Quantity[Array]:
+    def to_unit(self, unit: Unit) -> AbstractQuantity[Array]:
         """Convert to a new unit."""
         # TODO: self.value * self.unit.to(unit) doesn't work for temperatures
         #       This is for illustration purposes only.
@@ -77,15 +83,14 @@ class QuantityInterface(Generic[Array]):
         )
 
     def to_unit_value(self, unit: Unit) -> Array:
-        """Convert to a unit and return the value."""
         # TODO: self.value * self.unit.to(unit) doesn't work for temperatures
         #       This is for illustration purposes only.
         return cast(Array, self.value * self.unit.wrapped.to(unit.wrapped))
 
-    def __get_namespace__(self, api_version: str | None = None) -> ArrayAPINamespace:
-        from . import array_namespce
+    # --- Array API ---
 
-        return array_namespce
+    def __array_namespace__(self, api_version: str | None = None) -> ArrayAPINamespace:
+        return array_namespace
 
     # --- Wrapper API ---
 
@@ -98,82 +103,52 @@ class QuantityInterface(Generic[Array]):
         return getattr(self._wrapped_, name)
 
     # --- Arithmetic ---
+    # TODO: altneratively, this could be supported in the `xp` functions?
 
-    def __add__(self, other: Quantity[Array]) -> Quantity[Array]:
+    def __add__(self, other: AbstractQuantity[Array]) -> AbstractQuantity[Array]:
         return replace(
             self.quantity,
             value=self.value + other.to_unit_value(self.unit),
             unit=self.unit,
         )
 
-    def __sub__(self, other: Quantity[Array]) -> Quantity[Array]:
+    def __sub__(self, other: AbstractQuantity[Array]) -> AbstractQuantity[Array]:
         return replace(
             self.quantity,
             value=self.value - other.to_unit_value(self.unit),
             unit=self.unit,
         )
 
-    def __mul__(self, other: Array | Quantity[Array]) -> Quantity[Array]:
+    def __mul__(
+        self, other: Array | AbstractQuantity[Array]
+    ) -> AbstractQuantity[Array]:
         if not isinstance(other, QuantityAPI):
             return replace(self.quantity, value=self.value * other, unit=self.unit)
         return replace(
             self.quantity,
             value=self.value * other.value,
-            unit=cast("Unit", self.unit * other.unit),  # type: ignore[operator]
+            unit=cast("Unit", self.unit * other.unit),
         )
 
-    def __truediv__(self, other: Array | Quantity[Array]) -> Quantity[Array]:
+    def __truediv__(
+        self, other: Array | AbstractQuantity[Array]
+    ) -> AbstractQuantity[Array]:
         if not isinstance(other, QuantityAPI):
             return replace(self.quantity, value=self.value / other, unit=self.unit)
         return replace(
             self.quantity,
             value=self.value / other.value,
-            unit=cast("Unit", self.unit / other.unit),  # type: ignore[operator]
+            unit=cast("Unit", self.unit / other.unit),
         )
 
-    # --- NumPy Overloading ---
-
-    def __array_ufunc__(
-        self, ufunc: Any, method: Any, *inputs: Any, **kwargs: Any
-    ) -> Any:
-        if method != "__call__":
-            # TODO: dispatch to something other than `xp`
-            return NotImplemented
-
-        from . import array_namespce as xp
-
-        return getattr(xp, ufunc.__name__)(*inputs, **kwargs, _xp=np)
-
-    def __array_function__(
-        self, func: Any, types: Any, args: tuple[Any, ...], kwargs: dict[str, Any]
-    ) -> Any:
-        from . import array_namespce as xp
-
-        return getattr(xp, func.__name__)(*args, **kwargs, _xp=np)
+    def __pow__(self, other: Number) -> AbstractQuantity[Array]:
+        return replace(
+            self.quantity, value=self.value**other, unit=self.unit**other
+        )
 
 
-##############################################################################
-
-
-@singledispatch
-def get_interface(obj: Any, /) -> type[QuantityInterface[Array]]:
-    """Get the interface of an object."""
-    msg = f"Cannot get interface of {obj.__class__.__name__!r}"
-    raise TypeError(msg)
-
-
-@get_interface.register(QuantityInterface)
+@get_interface.register(AbstractQuantityInterface)
 def _get_interface_qi(
-    obj: QuantityInterface[Array], /
-) -> type[QuantityInterface[Array]]:
-    return obj.__class__
-
-
-@get_interface.register(Number)
-def _get_interface_number(_: Number | np.ndarray, /) -> type[QuantityInterface[Array]]:
-    return QuantityInterface
-
-
-@get_interface.register(np.ndarray)
-def _get_interface_ndarray(_: np.ndarray, /) -> type[QuantityInterface[Array]]:
-    return QuantityInterface
+    obj: AbstractQuantityInterface[Any], /
+) -> type[AbstractQuantityInterface[Any]]:
+    return obj.__class__  # allows user overrides of the type.

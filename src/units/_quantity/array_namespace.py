@@ -2,23 +2,22 @@ from __future__ import annotations
 
 __all__ = ["get_wrapped_namespace", "cos", "sin"]
 
-import math
-from collections.abc import Sequence
 from dataclasses import replace
-from numbers import Number
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-import numpy as np
-from array_api import Array as ArrayAPI, ArrayAPINamespace
 from astropy.units import rad as _apy_rad
 
+from units._quantity.up import result_unit
 from units._unit.core import Unit
 
-from .up import result_unit
+if TYPE_CHECKING:
+    from array_api import Array as ArrayAPI, ArrayAPINamespace
+
+    from units._quantity.base import AbstractQuantity
 
 
 def get_wrapped_namespace(
-    *xs: Any, api_version: str | None = None
+    *xs: AbstractQuantity[ArrayAPI], api_version: str | None = None
 ) -> ArrayAPINamespace:
     """Get the namespace of the wrapped array.
 
@@ -37,13 +36,7 @@ def get_wrapped_namespace(
     # `xs` contains one or more arrays.
     namespaces = set()
     for x in xs:
-        if isinstance(x.value, ArrayAPI):
-            namespaces.add(x.value.__array_namespace__(api_version=api_version))
-        # Backwards compatibility
-        elif isinstance(x.value, (np.ndarray, np.generic, Sequence)):
-            namespaces.add(np)
-        elif isinstance(x.value, Number):  # type: ignore[unreachable]
-            namespaces.add(math)
+        namespaces.add(x.interface.__wrapped_array_namespace__(api_version=api_version))
 
     if not namespaces:
         msg = "Unrecognized array input"
