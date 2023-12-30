@@ -1,11 +1,9 @@
 """Angle."""
 
-from typing import cast
-
 __all__ = ["AbstractAngle", "Angle", "Longitude", "Latitude"]
 
 from dataclasses import dataclass, field, replace
-from typing import final
+from typing import cast, final
 
 import astropy.units as u
 
@@ -19,7 +17,7 @@ from .fields import UnitField, ValueField
 
 @dataclass(frozen=True)
 class AbstractAngle(AbstractQuantity[Array]):
-    """Angle."""
+    """Abstract Angle."""
 
     wrap_angle: Quantity[Array | float]
 
@@ -64,7 +62,7 @@ class AbstractAngle(AbstractQuantity[Array]):
 
 
 # TODO: re-implement as Scalar, a new Type for scalars with Array-API support.
-wrap_angle = Quantity[float](360, unit=Unit(u.deg))
+default_wrap_angle = Quantity[float](360, unit=Unit(u.deg))
 
 
 @final
@@ -74,20 +72,24 @@ class Angle(AbstractAngle[Array]):
 
     value: Array = ValueField()  # type: ignore[assignment]
     unit: Unit = UnitField()  # type: ignore[assignment]
-    wrap_angle: Quantity[Array | float] = field(default=wrap_angle)
+    wrap_angle: Quantity[Array | float] = field(default=default_wrap_angle)
 
 
 @final
 @dataclass(frozen=True, slots=True)
 class Longitude(AbstractAngle[Array]):
+    """Longitude."""
+
     value: Array = ValueField()  # type: ignore[assignment]
     unit: Unit = UnitField()  # type: ignore[assignment]
-    wrap_angle: Quantity[Array | float] = field(default=wrap_angle)
+    wrap_angle: Quantity[Array | float] = field(default=default_wrap_angle)
 
 
 @final
 @dataclass(frozen=True, slots=True)
 class Latitude(AbstractAngle[Array]):
+    """Latitude."""
+
     value: Array = ValueField()  # type: ignore[assignment]
     unit: Unit = UnitField()  # type: ignore[assignment]
-    wrap_angle: Quantity[Array | float] = field(default=wrap_angle)
+    wrap_angle: Quantity[Array | float] = field(default=default_wrap_angle)

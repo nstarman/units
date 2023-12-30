@@ -16,5 +16,7 @@ Array = TypeVar("Array", bound=ArrayAPI)
 
 @dataclass(frozen=True)
 class Quantity(AbstractQuantity[Array]):
+    """Quantity."""
+
     value: Array = ValueField()  # type: ignore[assignment]
     unit: Unit = UnitField()  # type: ignore[assignment]

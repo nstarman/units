@@ -15,6 +15,8 @@ from units._unit.core import Unit
 if TYPE_CHECKING:
     from typing_extensions import Self
 
+    from units._quantity.interface.base import AbstractQuantityInterface
+
     from .base import AbstractQuantity
 
 Array = TypeVar("Array", bound=ArrayAPI)
@@ -54,8 +56,10 @@ class ValueField(Generic[Array]):
         return obj.interface.value
 
     def __set__(self, obj: AbstractQuantity[Array], value: Array) -> None:
-        interface = get_interface(value)
-        object.__setattr__(obj, "interface", interface(ref(obj), value))
+        interface: type[AbstractQuantityInterface[Array]] = get_interface(value)
+        object.__setattr__(
+            obj, "interface", interface(ref(obj), value)  # pylint: disable=not-callable
+        )
 
 
 @dataclass(frozen=True)

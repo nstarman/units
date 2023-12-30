@@ -18,6 +18,8 @@ Array = TypeVar("Array", bound=ArrayAPI)
 class LegacyNumPyQuantityInterface(
     AbstractQuantityInterface[Array], register=(Number, np.ndarray)
 ):
+    """Interface for pre-Array-API numpy arrays."""
+
     def __wrapped_array_namespace__(
         self, *, api_version: Any = None
     ) -> ArrayAPINamespace:
@@ -27,6 +29,8 @@ class LegacyNumPyQuantityInterface(
 class NumPyQuantityInterface(
     AbstractQuantityInterface[Array], register=array_api._array_object.Array
 ):
+    """Interface for Array-API compatible numpy arrays."""
+
     def __wrapped_array_namespace__(
         self, *, api_version: Any = None
     ) -> ArrayAPINamespace:

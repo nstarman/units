@@ -64,9 +64,17 @@ class LegacyQuantityMixin(Protocol[Array]):
     """Indefinite support for non-API methods."""
 
     def to(self: QuantityAPI[Array], unit: Unit) -> QuantityAPI[Array]:
+        """Convert to a unit.
+
+        This is a legacy method that points to `to_unit`.
+        """
         return self.to_unit(unit)
 
     def to_value(self: QuantityAPI[Array], unit: Unit) -> Array:
+        """Convert to a unit and return the value.
+
+        This is a legacy method that points to `to_unit_value`.
+        """
         return self.to_unit_value(unit)
 
 
@@ -80,6 +88,8 @@ class AbstractQuantity(
     NumPyMixin,
     metaclass=ABCMeta,
 ):
+    """Abstract Quantity."""
+
     value: Array
     unit: Unit
 
@@ -107,6 +117,7 @@ class AbstractQuantity(
         )
 
     def to_unit_value(self, unit: Unit | str) -> Array:
+        """Convert to a unit and return the value."""
         return self.interface.to_unit_value(
             Unit(unit) if not isinstance(unit, Unit) else unit
         )

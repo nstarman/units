@@ -35,6 +35,8 @@ class Registrant(Generic[T]):
 
 @dataclass(frozen=False, slots=True)
 class AbstractQuantityInterface(NumPyMixin, Generic[Array], metaclass=ABCMeta):
+    """Interface for Quantity <-> Array."""
+
     quantity_ref: ReferenceType[AbstractQuantity[Array]]
     value: Array
 
@@ -60,6 +62,7 @@ class AbstractQuantityInterface(NumPyMixin, Generic[Array], metaclass=ABCMeta):
 
     @property
     def quantity(self) -> AbstractQuantity[Array]:
+        """Quantity."""
         out = self.quantity_ref()
         if out is None:
             msg = "Quantity has been deleted."
@@ -70,6 +73,7 @@ class AbstractQuantityInterface(NumPyMixin, Generic[Array], metaclass=ABCMeta):
 
     @property
     def unit(self) -> Unit:
+        """Unit of the quantity."""
         return self.quantity.unit
 
     def to_unit(self, unit: Unit) -> AbstractQuantity[Array]:
@@ -83,6 +87,7 @@ class AbstractQuantityInterface(NumPyMixin, Generic[Array], metaclass=ABCMeta):
         )
 
     def to_unit_value(self, unit: Unit) -> Array:
+        """Convert to a unit and return the value."""
         # TODO: self.value * self.unit.to(unit) doesn't work for temperatures
         #       This is for illustration purposes only.
         return cast(Array, self.value * self.unit.wrapped.to(unit.wrapped))

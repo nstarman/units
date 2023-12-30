@@ -29,7 +29,10 @@ classifiers = [
 dynamic = ["version"]
 dependencies = [
   "array_api @ git+https://github.com/nstarman/array_api.git",
+  "array_api_compat",
   "astropy >= 5.3",
+  "mypy_extensions",
+  "typing_extensions",
 ]
 
 [project.optional-dependencies]
@@ -165,6 +168,7 @@ ignore-paths = [".*/_version.py"]
 reports.output-format = "colorized"
 similarities.ignore-imports = "yes"
 messages_control.disable = [
+  "cyclic-import",
   "design",
   "import-outside-toplevel",
   "fixme",
@@ -172,5 +176,6 @@ messages_control.disable = [
   "missing-module-docstring",
   "protected-access",
   "unused-argument",
+  "useless-return",
   "wrong-import-position",
 ]
