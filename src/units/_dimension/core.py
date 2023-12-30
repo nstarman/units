@@ -48,6 +48,6 @@ class Dimension(DimensionAPI, Wrapper[PhysicalType]):
         return self._wrapped
 
 
-@get_dimension_name.register  # type: ignore[misc]
+@get_dimension_name.register
 def _get_dimension_name_from_dimension(pt: Dimension, /) -> str:
     return pt.name

@@ -28,7 +28,7 @@ def get_wrapped_namespace(
         # Backwards compatibility
         elif isinstance(x.value, (np.ndarray, np.generic, Sequence)):
             namespaces.add(np)
-        elif isinstance(x.value, Number):
+        elif isinstance(x.value, Number):  # type: ignore[unreachable]
             namespaces.add(math)
 
     if not namespaces:

@@ -1,11 +1,10 @@
 """Unit utils."""
+
 from __future__ import annotations
 
 __all__: list[str] = []
 
 from typing import Any, ClassVar, TypeVar
-
-from typing_extensions import Self
 
 T = TypeVar("T")
 
@@ -14,7 +13,7 @@ T = TypeVar("T")
 
 
 class SingletonMeta(type):
-    _instances: ClassVar[dict[type[Self], Self]] = {}
+    _instances: ClassVar[dict[type, type]] = {}
 
     def __call__(cls: type[T], *args: Any, **kwargs: Any) -> T:
         # Check if instance already exists

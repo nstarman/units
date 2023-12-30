@@ -1,11 +1,29 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, overload, runtime_checkable
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+    from array_api import ArrayNamespace
     from typing_extensions import Self
 
     from ._dimension import Dimension, DimensionSystem
+    from ._quantity import Quantity
+
+
+class Array(Protocol):
+    def __array_namespace__(self, *, api_version: str | None) -> ArrayNamespace:
+        ...
+
+    def __mul__(self, other: Array | float) -> Array:
+        ...
+
+    def __truediv__(self, other: Array | float) -> Array:
+        ...
+
+    def __rtruediv__(self, other: Array | float) -> Array:
+        ...
 
 
 @runtime_checkable
@@ -25,11 +43,30 @@ class Unit(Protocol):
     def __sub__(self: Self, other: Self) -> Self:
         ...
 
+    @overload
     def __mul__(self: Self, other: Self) -> Self:
         ...
 
+    @overload
+    def __mul__(self: Self, other: Array) -> Quantity[Array]:
+        ...
+
+    def __mul__(self: Self, other: Self | Array) -> Self | Quantity[Array]:
+        ...
+
+    @overload
     def __truediv__(self: Self, other: Self) -> Self:
         ...
+
+    @overload
+    def __truediv__(self: Self, other: Array) -> Quantity[Array]:
+        ...
+
+    def __truediv__(self: Self, other: Self | Array) -> Self | Quantity[Array]:
+        ...
+
+
+# ============================================================================
 
 
 @runtime_checkable
@@ -52,5 +89,5 @@ class UnitSystem(Protocol):
     def __len__(self) -> int:
         return len(self.base_units)
 
-    def __iter__(self) -> Unit:
+    def __iter__(self) -> Iterator[Unit]:
         yield from self.base_units

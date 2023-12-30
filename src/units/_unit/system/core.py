@@ -44,7 +44,7 @@ def unitsystem(*units: AbstractUnitSystem | Unit | APYUnit) -> AbstractUnitSyste
     units = cast("tuple[Unit, ...]", units)
 
     # Check if the unit system is already registered
-    base_dimensions = tuple(x.physical_type for x in units)
+    base_dimensions = tuple(x.dimensions for x in units)
     if base_dimensions in UNITSYSTEMS_REGISTRY:
         return UNITSYSTEMS_REGISTRY[base_dimensions](*units)
 

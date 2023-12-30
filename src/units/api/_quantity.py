@@ -84,5 +84,5 @@ class ArrayQuantity(Quantity[Array], ArrayAPI, Protocol):  # type: ignore[misc]
     def __ne__(self, other: Quantity[Array]) -> Array:  # type: ignore[override]
         ...
 
-    def __lt__(self, other: Quantity[Array]) -> Array:  # type: ignore[override]
+    def __lt__(self, other: Quantity[Array]) -> Array:
         ...
