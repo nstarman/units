@@ -3,13 +3,13 @@ from __future__ import annotations
 __all__ = ["Unit"]
 
 from dataclasses import dataclass, replace
-from typing import TYPE_CHECKING, Any, TypeVar, overload
+from typing import TYPE_CHECKING, Any, TypeVar, cast, overload
 
-from array_api import Array as ArrayAPI
 from astropy.units import UnitBase as APYUnit  # noqa: TCH002
 
 from units._dimension.core import Dimension
 from units._dimension.utils import get_dimension_name
+from units.api._unit import Array as ArrayAPI
 
 if TYPE_CHECKING:
     from units._quantity.core import Quantity
@@ -90,7 +90,7 @@ class Unit:
 
         from units._quantity.core import Quantity
 
-        return Quantity(1.0 / other, self.wrapped)
+        return Quantity(cast("Array", 1.0 / other), self.wrapped)
 
     # --- Power ---
 

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Protocol, overload, runtime_checkable
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
-    from array_api import ArrayNamespace
+    from array_api import ArrayAPINamespace
     from typing_extensions import Self
 
     from ._dimension import Dimension, DimensionSystem
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 class Array(Protocol):
     """Array API."""
 
-    def __array_namespace__(self, *, api_version: str | None) -> ArrayNamespace:
+    def __array_namespace__(self, *, api_version: str | None) -> ArrayAPINamespace:
         ...
 
     def __mul__(self, other: Array | float) -> Array:

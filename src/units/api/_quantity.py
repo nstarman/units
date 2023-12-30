@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Protocol, TypeVar, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, TypeVar, override, runtime_checkable
 
 from array_api import Array as ArrayAPI
 
@@ -83,5 +83,6 @@ class ArrayQuantity(Quantity[Array], ArrayAPI, Protocol):  # type: ignore[misc] 
     def __ne__(self, other: Quantity[Array]) -> Array:  # type: ignore[override]
         ...
 
+    @override
     def __lt__(self, other: Quantity[Array]) -> Array:
         ...
