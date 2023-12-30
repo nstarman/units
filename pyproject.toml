@@ -59,6 +59,7 @@ Changelog = "https://github.com/nstarman/units/releases"
 [tool.hatch]
 version.source = "vcs"
 build.hooks.vcs.version-file = "src/units/_version.py"
+metadata.allow-direct-references = true
 
 [tool.hatch.env.default]
 features = ["test"]
