@@ -20,12 +20,10 @@ class Quantity(Wrapper[Value], Protocol[Value]):
     @property
     def value(self) -> Value:
         """Value of the quantity."""
-        ...
 
     @property
     def unit(self) -> UnitAPI:
         """Unit of the quantity."""
-        ...
 
     @property
     def _wrapped_(self) -> Value:
@@ -33,7 +31,6 @@ class Quantity(Wrapper[Value], Protocol[Value]):
 
     def to_unit(self, unit: UnitAPI) -> Quantity[Value]:
         """Convert to a new unit."""
-        ...
 
     def to_unit_value(self, unit: UnitAPI) -> Value:
         """Convert to a new unit and return the value."""
@@ -75,7 +72,9 @@ class Quantity(Wrapper[Value], Protocol[Value]):
 
 
 @runtime_checkable
-class ArrayQuantity(Quantity[Array], ArrayAPI, Protocol):  # type: ignore[misc]
+class ArrayQuantity(Quantity[Array], ArrayAPI, Protocol):  # type: ignore[misc]  # pylint: disable=duplicate-bases
+    """Array quantity API."""
+
     # --- Comparison ---
 
     def __eq__(self, other: Quantity[Array]) -> Array:  # type: ignore[override]
@@ -84,5 +83,5 @@ class ArrayQuantity(Quantity[Array], ArrayAPI, Protocol):  # type: ignore[misc]
     def __ne__(self, other: Quantity[Array]) -> Array:  # type: ignore[override]
         ...
 
-    def __lt__(self, other: Quantity[Array]) -> Array:  # type: ignore[override]
+    def __lt__(self, other: Quantity[Array]) -> Array:
         ...

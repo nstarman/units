@@ -1,23 +1,27 @@
 from __future__ import annotations
 
+from typing import cast
+
 __all__ = ["Angle"]
 
-from dataclasses import dataclass, replace
+from dataclasses import KW_ONLY, dataclass, replace
 
 import astropy.units as u
-from array_api import Array
 
 from units._dimension.core import Dimension
 from units._unit.core import Unit
 
-from .core import Quantity
+from .core import Array, Quantity
 
 _deg = Unit(u.deg)
 
 
 @dataclass(frozen=True)
 class Angle(Quantity[Array]):
-    wrap_angle: Quantity[Array] = Quantity[Array](360, unit=_deg)
+    """Angle."""
+
+    _: KW_ONLY
+    wrap_angle: Quantity[Array | float] = Quantity[Array | float](360, unit=_deg)
 
     def __post_init__(self) -> None:
         super().__post_init__()
@@ -29,10 +33,25 @@ class Angle(Quantity[Array]):
             msg = f"wrap angle must have angular units, not {self.wrap_angle.unit}"
             raise ValueError(msg)
 
-        # TODO! apply the wrap angle to the value
+        # TODO: apply the wrap angle to the value
 
     def wrap_at(self, wrap_angle: Quantity[Array] | None = None) -> Angle[Array]:
-        wa = self.wrap_angle if wrap_angle is None else wrap_angle
+        """Wrap the angle at the given value.
+
+        Parameters
+        ----------
+        wrap_angle : Quantity[Array], optional
+            Wrap angle, by default None.
+
+        Returns
+        -------
+        Angle[Array]
+            Wrapped angle.
+        """
+        wa = cast(
+            "Quantity[Array | float]",
+            self.wrap_angle if wrap_angle is None else wrap_angle,
+        )
         return replace(
             self,
             value=self.value % wa.to_unit_value(self.unit),

@@ -32,14 +32,16 @@ class DimensionSystem(DimensionSystemAPI):
     derived_dimensions: Mapping[
         Dimension,
         Mapping[Dimension, int],
-    ] = field(default_factory=lambda: MappingProxyType({}))
+    ] = field(
+        default_factory=lambda: MappingProxyType({})
+    )  # type: ignore[assignment]
     _: KW_ONLY
     cache: bool = True
 
     def __new__(
         cls: type[DimensionSystem],
         base_dimensions: tuple[Dimension, ...],
-        derived_dimensions: Mapping[Dimension, Mapping[Dimension, int]],
+        derived_dimensions: Mapping[Dimension, Mapping[Dimension, int]],  # noqa: ARG003
         *,
         cache: bool = True,
     ) -> DimensionSystem:

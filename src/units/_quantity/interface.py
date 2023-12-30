@@ -1,3 +1,5 @@
+"""Interface for Quantity objects."""
+
 from __future__ import annotations
 
 __all__: list[str] = []
@@ -5,18 +7,19 @@ __all__: list[str] = []
 from dataclasses import dataclass, replace
 from functools import singledispatch
 from numbers import Number
-from typing import Any, Generic, TypeVar, cast
-from weakref import ReferenceType
+from typing import TYPE_CHECKING, Any, Generic, TypeVar, cast
+from weakref import ReferenceType  # noqa: TCH003
 
 import numpy as np
 from array_api import Array as ArrayAPI, ArrayAPINamespace
 
-from units._unit.core import Unit
 from units.api import Quantity as QuantityAPI
 
-from .core import Quantity
+from .core import Quantity  # noqa: TCH001
 
-QT = TypeVar("QT", bound=Quantity)
+if TYPE_CHECKING:
+    from units._unit.core import Unit
+
 T = TypeVar("T")
 Array = TypeVar("Array", bound=ArrayAPI)
 
@@ -32,7 +35,9 @@ class Registrant(Generic[T]):
 
 
 @dataclass(frozen=False)
-class QuantityInterface(Generic[QT, Array]):
+class QuantityInterface(Generic[Array]):
+    """Interface for Quantity <-> Array interactions."""
+
     quantity_ref: ReferenceType[Quantity[Array]]
     value: Array
 
@@ -49,6 +54,7 @@ class QuantityInterface(Generic[QT, Array]):
 
     @property
     def quantity(self) -> Quantity[Array]:
+        """The Quantity."""
         out = self.quantity_ref()
         if out is None:
             msg = "Quantity has been deleted."
@@ -57,6 +63,7 @@ class QuantityInterface(Generic[QT, Array]):
 
     @property
     def unit(self) -> Unit:
+        """The unit."""
         return self.quantity.unit
 
     def to_unit(self, unit: Unit) -> Quantity[Array]:
@@ -70,14 +77,15 @@ class QuantityInterface(Generic[QT, Array]):
         )
 
     def to_unit_value(self, unit: Unit) -> Array:
+        """Convert to a unit and return the value."""
         # TODO: self.value * self.unit.to(unit) doesn't work for temperatures
         #       This is for illustration purposes only.
         return cast(Array, self.value * self.unit.wrapped.to(unit.wrapped))
 
     def __get_namespace__(self, api_version: str | None = None) -> ArrayAPINamespace:
-        from . import xp
+        from . import array_namespce
 
-        return xp
+        return array_namespce
 
     # --- Wrapper API ---
 
@@ -109,14 +117,18 @@ class QuantityInterface(Generic[QT, Array]):
         if not isinstance(other, QuantityAPI):
             return replace(self.quantity, value=self.value * other, unit=self.unit)
         return replace(
-            self.quantity, value=self.value * other.value, unit=self.unit * other.unit
+            self.quantity,
+            value=self.value * other.value,
+            unit=cast("Unit", self.unit * other.unit),  # type: ignore[operator]
         )
 
     def __truediv__(self, other: Array | Quantity[Array]) -> Quantity[Array]:
         if not isinstance(other, QuantityAPI):
             return replace(self.quantity, value=self.value / other, unit=self.unit)
         return replace(
-            self.quantity, value=self.value / other.value, unit=self.unit / other.unit
+            self.quantity,
+            value=self.value / other.value,
+            unit=cast("Unit", self.unit / other.unit),  # type: ignore[operator]
         )
 
     # --- NumPy Overloading ---
@@ -125,17 +137,17 @@ class QuantityInterface(Generic[QT, Array]):
         self, ufunc: Any, method: Any, *inputs: Any, **kwargs: Any
     ) -> Any:
         if method != "__call__":
-            # TODO! dispatch to something other than `xp`
+            # TODO: dispatch to something other than `xp`
             return NotImplemented
 
-        from . import xp
+        from . import array_namespce as xp
 
         return getattr(xp, ufunc.__name__)(*inputs, **kwargs, _xp=np)
 
     def __array_function__(
         self, func: Any, types: Any, args: tuple[Any, ...], kwargs: dict[str, Any]
     ) -> Any:
-        from . import xp
+        from . import array_namespce as xp
 
         return getattr(xp, func.__name__)(*args, **kwargs, _xp=np)
 
@@ -144,22 +156,24 @@ class QuantityInterface(Generic[QT, Array]):
 
 
 @singledispatch
-def get_interface(obj: Any, /) -> type[QuantityInterface]:
+def get_interface(obj: Any, /) -> type[QuantityInterface[Array]]:
     """Get the interface of an object."""
     msg = f"Cannot get interface of {obj.__class__.__name__!r}"
     raise TypeError(msg)
 
 
 @get_interface.register(QuantityInterface)
-def _get_interface_qi(obj: QuantityInterface, /) -> type[QuantityInterface]:
+def _get_interface_qi(
+    obj: QuantityInterface[Array], /
+) -> type[QuantityInterface[Array]]:
     return obj.__class__
 
 
 @get_interface.register(Number)
-def _get_interface_number(_: Number | np.ndarray, /) -> type[QuantityInterface]:
+def _get_interface_number(_: Number | np.ndarray, /) -> type[QuantityInterface[Array]]:
     return QuantityInterface
 
 
 @get_interface.register(np.ndarray)
-def _get_interface_ndarray(_: np.ndarray, /) -> type[QuantityInterface]:
+def _get_interface_ndarray(_: np.ndarray, /) -> type[QuantityInterface[Array]]:
     return QuantityInterface

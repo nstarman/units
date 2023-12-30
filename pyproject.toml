@@ -28,11 +28,13 @@ classifiers = [
 ]
 dynamic = ["version"]
 dependencies = [
-  "array_api",
+  "array_api @ git+https://github.com/nstarman/array_api.git",
   "astropy >= 5.3",
 ]
 
 [project.optional-dependencies]
+dask = ["dask >=2021.9.1"]
+xarray = ["xarray >=0.19"]
 test = [
   "pytest >=6",
   "pytest-cov >=3",
@@ -48,6 +50,13 @@ docs = [
   "sphinx_autodoc_typehints",
   "furo>=2023.08.17",
 ]
+all = [
+  "units[dask]",
+  "units[xarray]",
+  "units[test]",
+  "units[dev]",
+  "units[docs]",
+]
 
 [project.urls]
 Homepage = "https://github.com/nstarman/units"
@@ -59,6 +68,7 @@ Changelog = "https://github.com/nstarman/units/releases"
 [tool.hatch]
 version.source = "vcs"
 build.hooks.vcs.version-file = "src/units/_version.py"
+metadata.allow-direct-references = true
 
 [tool.hatch.env.default]
 features = ["test"]
@@ -104,7 +114,11 @@ port.exclude_lines = [
 
   [[tool.mypy.overrides]]
     module = [
+      "array_api.*",
       "astropy.*",
+      "dask.*",
+      "numpy.*",
+      "xarray.*",
     ]
     ignore_errors = true
     ignore_missing_imports = true
@@ -120,6 +134,8 @@ ignore = [
   "ANN401",  # Dynamically typed expressions (typing.Any) are disallowed in `__getattr__`
   "COM812",  # Missing trailing comma
   "D105",    # Missing docstring in magic method
+  "D203",    # 1 blank line required before class docstring
+  "D213",    # Multi-line docstring summary should start at the second line
   "ERA001",  # Commented-out code
   "FIX002",  # Line contains TODO, consider resolving the issue
   "PD",      # pandas-vet
@@ -129,12 +145,14 @@ ignore = [
   "SLF001",  # Private member accessed
   "TD002",   # Missing author in TODO; try: `# TODO(<author_name>): ...` or `# TODO @<author_name>: ...`
   "TD003",   # Missing issue link on the line following this TODO
+  "UP038",   # Use `X | Y` in `isinstance` call instead of `(X, Y)`
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F403"]
+"docs/conf.py" = ["A001", "D100", "INP001"]
 "tests/**" = ["ANN", "D103", "S101", "T20"]
-"noxfile.py" = ["T20"]
+"noxfile.py" = ["D100", "T20"]
 
 [tool.ruff.lint.isort]
 combine-as-imports = true
@@ -147,8 +165,11 @@ reports.output-format = "colorized"
 similarities.ignore-imports = "yes"
 messages_control.disable = [
   "design",
+  "import-outside-toplevel",
   "fixme",
   "line-too-long",
   "missing-module-docstring",
+  "protected-access",
+  "unused-argument",
   "wrong-import-position",
 ]

@@ -1,7 +1,5 @@
 """Test the package itself."""
 
-from __future__ import annotations
-
 import importlib.metadata
 
 import units as m

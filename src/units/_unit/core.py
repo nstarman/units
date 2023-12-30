@@ -5,21 +5,18 @@ __all__ = ["Unit"]
 from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, overload
 
-from array_api import Array
 from astropy.units import UnitBase as APYUnit  # noqa: TCH002
 
 from units._dimension.core import Dimension
 from units._dimension.utils import get_dimension_name
-from units.api import Unit as UnitAPI
 
 if TYPE_CHECKING:
-    from typing_extensions import Self
-
-    from units import Quantity
+    from units._quantity.core import Quantity
+    from units.api._unit import Array
 
 
 @dataclass(frozen=True)
-class Unit(UnitAPI):
+class Unit:
     """Unit.
 
     .. todo::
@@ -36,6 +33,7 @@ class Unit(UnitAPI):
 
     @property
     def dimensions(self) -> Dimension:
+        """Dimension of the unit."""
         return Dimension(get_dimension_name(self._wrapped_))
 
     def __repr__(self) -> str:
@@ -60,16 +58,29 @@ class Unit(UnitAPI):
         ...
 
     @overload
-    def __mul__(self: Self, other: Array) -> Quantity[Array]:
+    def __mul__(self, other: Array) -> Quantity[Array]:
         ...
 
-    def __mul__(self: Self, other: Unit | Array) -> Unit | Quantity[Array]:
+    def __mul__(self, other: Unit | Array) -> Unit | Quantity[Array]:
         if isinstance(other, Unit):
             return replace(self, wrapped=self.wrapped * other.wrapped)
 
-        from units import Quantity
+        from units._quantity.core import Quantity
 
         return Quantity(other, self.wrapped)
 
+    @overload
     def __truediv__(self, other: Unit) -> Unit:
-        return replace(self, wrapped=self.wrapped / other.wrapped)
+        ...
+
+    @overload
+    def __truediv__(self, other: Array) -> Quantity[Array]:
+        ...
+
+    def __truediv__(self, other: Unit | Array) -> Unit | Quantity[Array]:
+        if isinstance(other, Unit):
+            return replace(self, wrapped=self.wrapped / other.wrapped)
+
+        from units._quantity.core import Quantity
+
+        return Quantity(1.0 / other, self.wrapped)

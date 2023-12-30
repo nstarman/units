@@ -32,7 +32,7 @@ def _trig(units: tuple[Unit, ...]) -> Unit:
     if len(units) != 1:
         msg = "trig operation requires exactly one unit."
         raise ValueError(msg)
-    elif units[0].dimensions != Dimension("angle"):
+    if units[0].dimensions != Dimension("angle"):
         msg = "trig operation requires a dimensionless unit."
         raise ValueError(msg)
     return dimensionless
@@ -42,7 +42,7 @@ def _sigmoid(units: tuple[Unit, ...]) -> Unit:
     if len(units) != 1:
         msg = "sigmoid operation requires exactly one unit."
         raise ValueError(msg)
-    elif units[0].dimensions != Dimension("dimensionless"):
+    if units[0].dimensions != Dimension("dimensionless"):
         msg = "sigmoid operation requires a dimensionless unit."
         raise ValueError(msg)
     return dimensionless

@@ -3,11 +3,16 @@ from __future__ import annotations
 
 __all__: list[str] = []
 
-from typing import Annotated, Any, TypeGuard
+from typing import (  # type: ignore[attr-defined]
+    Annotated,
+    Any,
+    TypeGuard,
+    _AnnotatedAlias,
+)
 
-_annot_type = type(Annotated[int, "_"])
+AnnotationType = type(Annotated[int, "_"])
 
 
-def is_annotated(hint: Any, /, annot_type: Any = _annot_type) -> TypeGuard[_annot_type]:
+def is_annotated(hint: Any) -> TypeGuard[_AnnotatedAlias]:
     """Check if a type hint is an `Annotated` type."""
-    return type(hint) is annot_type
+    return type(hint) is AnnotationType  # pylint: disable=unidiomatic-typecheck

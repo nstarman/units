@@ -1,4 +1,5 @@
 """Unit utils."""
+
 from __future__ import annotations
 
 __all__: list[str] = []
@@ -13,6 +14,7 @@ _apy_speed = get_physical_type("speed")
 
 @singledispatch
 def get_dimension_name(pt: Any, /) -> str:
+    """Get the dimension name from the object."""
     msg = f"Cannot get dimension name from {pt!r}."
     raise TypeError(msg)
 

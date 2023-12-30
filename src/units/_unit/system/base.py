@@ -71,7 +71,10 @@ class AbstractUnitSystem(UnitSystemAPI):
         # check that the field names match the dimensions
         dimensionsystem = DimensionSystem(dimensions, {})
         if set(field_names) != set(dimensionsystem.names):
-            msg = f"Field names {field_names} do not match dimensions {dimensionsystem.names}."
+            msg = (
+                f"Field names {field_names} do not match "
+                f"dimensions {dimensionsystem.names}."
+            )
             raise ValueError(msg)
 
         # Add attributes to the class
@@ -86,7 +89,7 @@ class AbstractUnitSystem(UnitSystemAPI):
         object.__setattr__(self, "_registry", registry)
 
     @property
-    def base_units(self) -> tuple[Unit, ...]:
+    def base_units(self) -> tuple[Unit, ...]:  # type: ignore[override]
         """List of core units."""
         return tuple(getattr(self, k) for k in self._base_field_names)
 

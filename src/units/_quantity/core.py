@@ -39,13 +39,34 @@ class ValueField(Generic[Array]):
         if obj is None:
             msg = "can only be accessed through an instance."
             raise AttributeError(msg)
-        return cast("Array", obj._interface.value)
+        return obj._interface.value
 
     def __set__(self, obj: Quantity[Array], value: Array) -> None:
         from .interface import get_interface
 
-        interface = get_interface(value)
-        object.__setattr__(obj, "_interface", interface(ref(obj), value))
+        interface: type[QuantityInterface[Array]] = get_interface(value)
+        object.__setattr__(
+            obj,
+            "_interface",
+            interface(ref(obj), value),  # pylint: disable=not-callable
+        )
+
+
+# ==========================================================================
+
+
+@dataclass(frozen=True, slots=True)
+class UnitField:
+    """Unit field descriptor."""
+
+    def __get__(self, obj: Quantity[Array] | None, obj_cls: Any) -> Unit:
+        if obj is None:
+            msg = "can only be accessed through an instance."
+            raise AttributeError(msg)
+        return cast("Unit", obj._unit)
+
+    def __set__(self, obj: Quantity[Array], value: Unit) -> None:
+        object.__setattr__(obj, "_unit", Unit(value))
 
 
 # ==========================================================================
@@ -53,11 +74,13 @@ class ValueField(Generic[Array]):
 
 @dataclass(frozen=True)
 class Quantity(Generic[Array]):
-    value: ValueField[Array] = ValueField()
-    unit: Unit  # TODO: add parameterization
+    """Quantity."""
+
+    value: Array = ValueField[Array]()  # type: ignore[assignment]
+    unit: Unit = UnitField()  # type: ignore[assignment]
 
     def __post_init__(self) -> None:
-        self._interface: QuantityInterface[Self, Array]
+        self._interface: QuantityInterface[Array]
 
     def __get_namespace__(self, api_version: str | None = None) -> ArrayAPINamespace:
         from . import array_namespce
@@ -67,7 +90,7 @@ class Quantity(Generic[Array]):
     # --- Wrapper API ---
 
     @property
-    def _wrapped_(self: Self) -> QuantityInterface[Self, Array]:
+    def _wrapped_(self: Self) -> QuantityInterface[Array]:
         """Wrapped."""
         return self._interface
 
@@ -82,6 +105,7 @@ class Quantity(Generic[Array]):
         return self._interface.to_unit(unit)
 
     def to_unit_value(self, unit: Unit) -> Array:
+        """Convert to a unit and return the value."""
         return self._interface.to_unit_value(unit)
 
     # ==========================================================================

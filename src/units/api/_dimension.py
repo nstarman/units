@@ -20,7 +20,6 @@ class DimensionSystem(Protocol):
     @property
     def names(self) -> tuple[str, ...]:
         """Names of the base dimensions."""
-        ...
 
     def __len__(self) -> int:
         return len(self.base_dimensions)
