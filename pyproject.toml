@@ -33,6 +33,8 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+dask = ["dask >=2021.9.1"]
+xarray = ["xarray >=0.19"]
 test = [
   "pytest >=6",
   "pytest-cov >=3",
@@ -47,6 +49,13 @@ docs = [
   "sphinx_copybutton",
   "sphinx_autodoc_typehints",
   "furo>=2023.08.17",
+]
+all = [
+  "units[dask]",
+  "units[xarray]",
+  "units[test]",
+  "units[dev]",
+  "units[docs]",
 ]
 
 [project.urls]
@@ -156,8 +165,11 @@ reports.output-format = "colorized"
 similarities.ignore-imports = "yes"
 messages_control.disable = [
   "design",
+  "import-outside-toplevel",
   "fixme",
   "line-too-long",
   "missing-module-docstring",
+  "protected-access",
+  "unused-argument",
   "wrong-import-position",
 ]

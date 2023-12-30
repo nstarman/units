@@ -7,6 +7,8 @@ T_co = TypeVar("T_co", covariant=True)
 
 @runtime_checkable
 class Wrapper(Protocol[T_co]):
+    """Wrapper API."""
+
     @property
     def _wrapped_(self) -> T_co:
         ...

@@ -13,6 +13,8 @@ T = TypeVar("T")
 
 
 class SingletonMeta(type):
+    """Metaclass for Singleton classes."""
+
     _instances: ClassVar[dict[type, type]] = {}
 
     def __call__(cls: type[T], *args: Any, **kwargs: Any) -> T:

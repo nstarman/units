@@ -5,10 +5,10 @@ __all__: list[str] = []
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
-from xarray import register_dataarray_accessor
+from xarray import register_dataarray_accessor  # pylint: disable=import-error
 
 if TYPE_CHECKING:
-    from xarray.core.dataarray import DataArray
+    from xarray.core.dataarray import DataArray  # pylint: disable=import-error
 
     from units._unit.core import Unit
 

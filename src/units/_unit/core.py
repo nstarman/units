@@ -33,6 +33,7 @@ class Unit:
 
     @property
     def dimensions(self) -> Dimension:
+        """Dimension of the unit."""
         return Dimension(get_dimension_name(self._wrapped_))
 
     def __repr__(self) -> str:

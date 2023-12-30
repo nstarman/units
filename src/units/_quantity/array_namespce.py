@@ -20,6 +20,20 @@ from .up import result_unit
 def get_wrapped_namespace(
     *xs: Any, api_version: str | None = None
 ) -> ArrayAPINamespace:
+    """Get the namespace of the wrapped array.
+
+    Parameters
+    ----------
+    xs : Any
+        Quantity-like objects.
+    api_version : str or None, optional
+        Array API version, by default `None`.
+
+    Returns
+    -------
+    ArrayAPINamespace
+        Array API namespace.
+    """
     # `xs` contains one or more arrays.
     namespaces = set()
     for x in xs:
@@ -45,6 +59,7 @@ _rad = Unit(_apy_rad)
 
 
 def cos(x: Any, /, *, _xp: ArrayAPINamespace | None = None) -> Any:
+    """Cosine."""
     xp = get_wrapped_namespace(x) if _xp is None else _xp
     return replace(
         x, value=xp.cos(x.to_unit_value(_rad)), unit=result_unit("cos", x.unit)
@@ -52,6 +67,7 @@ def cos(x: Any, /, *, _xp: ArrayAPINamespace | None = None) -> Any:
 
 
 def sin(x: Any, /, *, _xp: ArrayAPINamespace | None = None) -> Any:
+    """Sine."""
     xp = get_wrapped_namespace(x) if _xp is None else _xp
     return replace(
         x, value=xp.sin(x.to_unit_value(_rad)), unit=result_unit("sin", x.unit)

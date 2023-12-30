@@ -45,7 +45,11 @@ class ValueField(Generic[Array]):
         from .interface import get_interface
 
         interface: type[QuantityInterface[Array]] = get_interface(value)
-        object.__setattr__(obj, "_interface", interface(ref(obj), value))
+        object.__setattr__(
+            obj,
+            "_interface",
+            interface(ref(obj), value),  # pylint: disable=not-callable
+        )
 
 
 # ==========================================================================
@@ -70,8 +74,10 @@ class UnitField:
 
 @dataclass(frozen=True)
 class Quantity(Generic[Array]):
-    value: ValueField[Array] = ValueField()
-    unit: UnitField = UnitField()
+    """Quantity."""
+
+    value: Array = ValueField[Array]()  # type: ignore[assignment]
+    unit: Unit = UnitField()  # type: ignore[assignment]
 
     def __post_init__(self) -> None:
         self._interface: QuantityInterface[Array]
@@ -99,6 +105,7 @@ class Quantity(Generic[Array]):
         return self._interface.to_unit(unit)
 
     def to_unit_value(self, unit: Unit) -> Array:
+        """Convert to a unit and return the value."""
         return self._interface.to_unit_value(unit)
 
     # ==========================================================================

@@ -1,3 +1,5 @@
+"""Interface for Quantity objects."""
+
 from __future__ import annotations
 
 __all__: list[str] = []
@@ -34,6 +36,8 @@ class Registrant(Generic[T]):
 
 @dataclass(frozen=False)
 class QuantityInterface(Generic[Array]):
+    """Interface for Quantity <-> Array interactions."""
+
     quantity_ref: ReferenceType[Quantity[Array]]
     value: Array
 
@@ -50,6 +54,7 @@ class QuantityInterface(Generic[Array]):
 
     @property
     def quantity(self) -> Quantity[Array]:
+        """The Quantity."""
         out = self.quantity_ref()
         if out is None:
             msg = "Quantity has been deleted."
@@ -58,6 +63,7 @@ class QuantityInterface(Generic[Array]):
 
     @property
     def unit(self) -> Unit:
+        """The unit."""
         return self.quantity.unit
 
     def to_unit(self, unit: Unit) -> Quantity[Array]:
@@ -71,6 +77,7 @@ class QuantityInterface(Generic[Array]):
         )
 
     def to_unit_value(self, unit: Unit) -> Array:
+        """Convert to a unit and return the value."""
         # TODO: self.value * self.unit.to(unit) doesn't work for temperatures
         #       This is for illustration purposes only.
         return cast(Array, self.value * self.unit.wrapped.to(unit.wrapped))

@@ -18,6 +18,8 @@ _deg = Unit(u.deg)
 
 @dataclass(frozen=True)
 class Angle(Quantity[Array]):
+    """Angle."""
+
     _: KW_ONLY
     wrap_angle: Quantity[Array | float] = Quantity[Array | float](360, unit=_deg)
 
@@ -34,6 +36,18 @@ class Angle(Quantity[Array]):
         # TODO: apply the wrap angle to the value
 
     def wrap_at(self, wrap_angle: Quantity[Array] | None = None) -> Angle[Array]:
+        """Wrap the angle at the given value.
+
+        Parameters
+        ----------
+        wrap_angle : Quantity[Array], optional
+            Wrap angle, by default None.
+
+        Returns
+        -------
+        Angle[Array]
+            Wrapped angle.
+        """
         wa = cast(
             "Quantity[Array | float]",
             self.wrap_angle if wrap_angle is None else wrap_angle,

@@ -13,6 +13,8 @@ if TYPE_CHECKING:
 
 
 class Array(Protocol):
+    """Array API."""
+
     def __array_namespace__(self, *, api_version: str | None) -> ArrayNamespace:
         ...
 
@@ -33,7 +35,6 @@ class Unit(Protocol):
     @property
     def dimensions(self) -> Dimension:
         """Dimension of the unit."""
-        ...
 
     # --- Arithmetic ---
 
@@ -75,13 +76,11 @@ class UnitSystem(Protocol):
 
     @property
     def base_units(self) -> tuple[Unit, ...]:
-        """List of core units."""
-        ...
+        """Tuple of core units."""
 
     @property
     def dimension_system(self) -> DimensionSystem:
         """Dimension system."""
-        ...
 
     # def __getitem__(self, key: str | Unit | Dimension) -> Unit:
     #     ...
