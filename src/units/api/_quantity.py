@@ -3,11 +3,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Protocol, TypeVar, runtime_checkable
 
 from array_api import Array as ArrayAPI
+from typing_extensions import override
 
-from ._wrapper import Wrapper
+from units.api._wrapper import Wrapper
 
 if TYPE_CHECKING:
-    from ._unit import Unit as UnitAPI
+    from units.api._unit import Unit as UnitAPI
 
 Value = TypeVar("Value")
 Array = TypeVar("Array", bound=ArrayAPI)
@@ -83,5 +84,6 @@ class ArrayQuantity(Quantity[Array], ArrayAPI, Protocol):  # type: ignore[misc] 
     def __ne__(self, other: Quantity[Array]) -> Array:  # type: ignore[override]
         ...
 
+    @override
     def __lt__(self, other: Quantity[Array]) -> Array:
         ...

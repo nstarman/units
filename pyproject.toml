@@ -29,7 +29,10 @@ classifiers = [
 dynamic = ["version"]
 dependencies = [
   "array_api @ git+https://github.com/nstarman/array_api.git",
+  "array_api_compat",
   "astropy >= 5.3",
+  "mypy_extensions",
+  "typing_extensions",
 ]
 
 [project.optional-dependencies]
@@ -81,6 +84,7 @@ addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
 xfail_strict = true
 filterwarnings = [
   "error",
+  "ignore:The numpy\\.array_api submodule is still experimental.:UserWarning",
 ]
 log_cli_level = "INFO"
 testpaths = [
@@ -114,7 +118,7 @@ port.exclude_lines = [
 
   [[tool.mypy.overrides]]
     module = [
-      "array_api.*",
+      "array_api_compat.*",
       "astropy.*",
       "dask.*",
       "numpy.*",
@@ -140,6 +144,7 @@ ignore = [
   "FIX002",  # Line contains TODO, consider resolving the issue
   "PD",      # pandas-vet
   "PLR",     # Design related pylint codes
+  "PYI041",  # Use `float` instead of `int | float`
   "RET506",  # Unnecessary `elif` after `raise` statement
   "RUF009",  # Do not perform function call `Unit` in dataclass defaults
   "SLF001",  # Private member accessed
@@ -164,6 +169,7 @@ ignore-paths = [".*/_version.py"]
 reports.output-format = "colorized"
 similarities.ignore-imports = "yes"
 messages_control.disable = [
+  "cyclic-import",
   "design",
   "import-outside-toplevel",
   "fixme",
@@ -171,5 +177,6 @@ messages_control.disable = [
   "missing-module-docstring",
   "protected-access",
   "unused-argument",
+  "useless-return",
   "wrong-import-position",
 ]

@@ -1,27 +1,25 @@
-from __future__ import annotations
+"""Angle."""
 
-from typing import cast
+__all__ = ["AbstractAngle", "Angle", "Longitude", "Latitude"]
 
-__all__ = ["Angle"]
-
-from dataclasses import KW_ONLY, dataclass, replace
+from dataclasses import dataclass, field, replace
+from typing import cast, final
 
 import astropy.units as u
 
 from units._dimension.core import Dimension
 from units._unit.core import Unit
 
-from .core import Array, Quantity
-
-_deg = Unit(u.deg)
+from .base import AbstractQuantity, Array
+from .core import Quantity
+from .fields import UnitField, ValueField
 
 
 @dataclass(frozen=True)
-class Angle(Quantity[Array]):
-    """Angle."""
+class AbstractAngle(AbstractQuantity[Array]):
+    """Abstract Angle."""
 
-    _: KW_ONLY
-    wrap_angle: Quantity[Array | float] = Quantity[Array | float](360, unit=_deg)
+    wrap_angle: Quantity[Array | float]
 
     def __post_init__(self) -> None:
         super().__post_init__()
@@ -35,7 +33,9 @@ class Angle(Quantity[Array]):
 
         # TODO: apply the wrap angle to the value
 
-    def wrap_at(self, wrap_angle: Quantity[Array] | None = None) -> Angle[Array]:
+    def wrap_at(
+        self, wrap_angle: Quantity[Array] | None = None
+    ) -> "AbstractAngle[Array]":
         """Wrap the angle at the given value.
 
         Parameters
@@ -52,9 +52,44 @@ class Angle(Quantity[Array]):
             "Quantity[Array | float]",
             self.wrap_angle if wrap_angle is None else wrap_angle,
         )
+        # Apply the wrap angle to the value
         return replace(
             self,
             value=self.value % wa.to_unit_value(self.unit),
             unit=self.unit,
             wrap_angle=wa,
         )
+
+
+# TODO: re-implement as Scalar, a new Type for scalars with Array-API support.
+default_wrap_angle = Quantity[float](360, unit=Unit(u.deg))
+
+
+@final
+@dataclass(frozen=True, slots=True)
+class Angle(AbstractAngle[Array]):
+    """Angle."""
+
+    value: Array = ValueField()  # type: ignore[assignment]
+    unit: Unit = UnitField()  # type: ignore[assignment]
+    wrap_angle: Quantity[Array | float] = field(default=default_wrap_angle)
+
+
+@final
+@dataclass(frozen=True, slots=True)
+class Longitude(AbstractAngle[Array]):
+    """Longitude."""
+
+    value: Array = ValueField()  # type: ignore[assignment]
+    unit: Unit = UnitField()  # type: ignore[assignment]
+    wrap_angle: Quantity[Array | float] = field(default=default_wrap_angle)
+
+
+@final
+@dataclass(frozen=True, slots=True)
+class Latitude(AbstractAngle[Array]):
+    """Latitude."""
+
+    value: Array = ValueField()  # type: ignore[assignment]
+    unit: Unit = UnitField()  # type: ignore[assignment]
+    wrap_angle: Quantity[Array | float] = field(default=default_wrap_angle)
