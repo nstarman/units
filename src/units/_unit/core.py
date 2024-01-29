@@ -63,8 +63,7 @@ class Unit:
         ...
 
     @overload
-    def __mul__(self, other: Array) -> Quantity[Array]:
-        ...
+    def __mul__(self, other: Array) -> Quantity[Array]: ...
 
     def __mul__(self, other: Unit | Array) -> Unit | Quantity[Array]:
         if isinstance(other, Unit):
@@ -77,12 +76,10 @@ class Unit:
     # --- Division ---
 
     @overload
-    def __truediv__(self, other: Unit) -> Unit:
-        ...
+    def __truediv__(self, other: Unit) -> Unit: ...
 
     @overload
-    def __truediv__(self, other: Array) -> Quantity[Array]:
-        ...
+    def __truediv__(self, other: Array) -> Quantity[Array]: ...
 
     def __truediv__(self, other: Unit | Array) -> Unit | Quantity[Array]:
         if isinstance(other, Unit):

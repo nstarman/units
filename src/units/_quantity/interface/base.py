@@ -57,8 +57,7 @@ class AbstractQuantityInterface(NumPyMixin, Generic[Array], metaclass=ABCMeta):
     @abstractmethod
     def __wrapped_array_namespace__(
         self, *, api_version: str | None = None
-    ) -> ArrayAPINamespace:
-        ...
+    ) -> ArrayAPINamespace: ...
 
     @property
     def quantity(self) -> AbstractQuantity[Array]:
@@ -147,9 +146,7 @@ class AbstractQuantityInterface(NumPyMixin, Generic[Array], metaclass=ABCMeta):
         )
 
     def __pow__(self, other: Number) -> AbstractQuantity[Array]:
-        return replace(
-            self.quantity, value=self.value**other, unit=self.unit**other
-        )
+        return replace(self.quantity, value=self.value**other, unit=self.unit**other)
 
 
 @get_interface.register(AbstractQuantityInterface)
