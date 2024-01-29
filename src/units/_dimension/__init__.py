@@ -1,4 +1,5 @@
 """Dimension system."""
+
 from __future__ import annotations
 
 from . import builtin_dimensions, builtin_systems, core, system

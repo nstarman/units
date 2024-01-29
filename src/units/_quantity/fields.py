@@ -32,12 +32,10 @@ class ValueField(Generic[Array]):
     """
 
     @overload
-    def __get__(self, obj: AbstractQuantity[Array], obj_cls: Any) -> Array:
-        ...
+    def __get__(self, obj: AbstractQuantity[Array], obj_cls: Any) -> Array: ...
 
     @overload
-    def __get__(self, obj: None, obj_cls: Any) -> Self:
-        ...
+    def __get__(self, obj: None, obj_cls: Any) -> Self: ...
 
     def __get__(
         self, obj: AbstractQuantity[Array] | None, obj_cls: Any
@@ -67,12 +65,10 @@ class UnitField:
     """Unit field descriptor."""
 
     @overload
-    def __get__(self, obj: AbstractQuantity[Array], obj_cls: Any) -> Unit:
-        ...
+    def __get__(self, obj: AbstractQuantity[Array], obj_cls: Any) -> Unit: ...
 
     @overload
-    def __get__(self, obj: None, obj_cls: Any) -> Self:
-        ...
+    def __get__(self, obj: None, obj_cls: Any) -> Self: ...
 
     def __get__(self, obj: AbstractQuantity[Array] | None, obj_cls: Any) -> Unit | Self:
         # Get from class

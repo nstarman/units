@@ -1,4 +1,5 @@
 """Units API."""
+
 from __future__ import annotations
 
 from ._dimension import Dimension, DimensionSystem

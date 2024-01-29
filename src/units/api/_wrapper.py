@@ -10,8 +10,7 @@ class Wrapper(Protocol[T_co]):
     """Wrapper API."""
 
     @property
-    def _wrapped_(self) -> T_co:
-        ...
+    def _wrapped_(self) -> T_co: ...
 
     def __getattr__(self, name: str) -> Any:
         return getattr(self._wrapped_, name)
