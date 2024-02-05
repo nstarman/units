@@ -24,6 +24,7 @@ def result_unit(op: str, *units: Unit) -> Unit:
     -------
     `~astropy.units.Unit`
         The result unit.
+
     """
     return _RESULT_UNIT_OP[op](units)
 
