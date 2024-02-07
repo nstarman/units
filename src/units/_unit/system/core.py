@@ -28,6 +28,7 @@ def unitsystem(*units: AbstractUnitSystem | Unit | APYUnit) -> AbstractUnitSyste
     -------
     AbstractUnitSystem
         The unit system.
+
     """
     if isinstance(units[0], AbstractUnitSystem):
         if len(units) > 1:

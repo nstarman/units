@@ -32,6 +32,7 @@ def get_wrapped_namespace(
     -------
     ArrayAPINamespace
         Array API namespace.
+
     """
     # `xs` contains one or more arrays.
     namespaces = set()

@@ -47,6 +47,7 @@ class AbstractAngle(AbstractQuantity[Array]):
         -------
         Angle[Array]
             Wrapped angle.
+
         """
         wa = cast(
             "Quantity[Array | float]",
