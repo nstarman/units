@@ -175,6 +175,7 @@ messages_control.disable = [
   "fixme",
   "line-too-long",
   "missing-module-docstring",
+  "no-member",  # can't detect astropy units
   "protected-access",
   "unused-argument",
   "useless-return",
